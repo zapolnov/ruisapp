@@ -45,6 +45,18 @@ if(NOT RUISAPP_DISABLE_EXAMPLE)
         RECURSIVE
     )
 
-    add_executable(${name}-test ${app_srcs})
-    target_link_libraries(${name}-test PUBLIC ruis::ruis ruisapp::ruisapp)
+    set(app_rsrs)
+    add_resource_directory(app_rsrs
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../tests/app/res"
+        )
+
+    declare_executable(${name}-test
+        SOURCES
+            ${app_srcs}
+            ${app_rsrs}
+        DEPENDENCIES
+            ruis
+        LINK_LIBRARIES
+            ruisapp
+    )
 endif()
