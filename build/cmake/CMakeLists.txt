@@ -14,7 +14,7 @@ if(NOT TARGET ruis-render-opengl::ruis-render-opengl)
 find_package(ruis-render-opengl CONFIG REQUIRED)
 endif()
 
-set(srcdir "${CMAKE_CURRENT_SOURCE_DIR}/../src/${name}")
+set(srcdir "${CMAKE_CURRENT_SOURCE_DIR}/../../src/${name}")
 file(GLOB_RECURSE src RELATIVE "${srcdir}" CONFIGURE_DEPENDS "${srcdir}/*.cpp" "${srcdir}/*.hpp")
 
 set(srcs)
@@ -38,7 +38,7 @@ set_target_properties(${name} PROPERTIES CXX_EXTENSIONS OFF)
 target_include_directories(
     ${name}
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../src>
         $<INSTALL_INTERFACE:include>
 )
 
@@ -51,7 +51,7 @@ target_link_libraries(
 
 if(NOT RUISAPP_DISABLE_EXAMPLE)
 
-set(app_srcdir "${CMAKE_CURRENT_SOURCE_DIR}/../tests/app/src")
+set(app_srcdir "${CMAKE_CURRENT_SOURCE_DIR}/../../tests/app/src")
 file(GLOB_RECURSE app_src RELATIVE "${app_srcdir}" CONFIGURE_DEPENDS "${app_srcdir}/*.cpp" "${app_srcdir}/*.hpp")
 
 set(app_srcs)
@@ -79,7 +79,7 @@ if(NOT RUISAPP_DISABLE_INSTALL)
 # install library header files preserving directory hierarchy
 install(
     DIRECTORY
-        "${CMAKE_CURRENT_SOURCE_DIR}/../src/${name}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../src/${name}"
     DESTINATION
         "${CMAKE_INSTALL_INCLUDEDIR}"
     FILES_MATCHING PATTERN
