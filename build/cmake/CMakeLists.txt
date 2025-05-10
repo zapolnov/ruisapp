@@ -24,17 +24,37 @@ add_source_directory(srcs
     RECURSIVE
 )
 
-declare_library(${name}
+declare_library(${name}-opengl
     SOURCES
         ${srcs}
     PUBLIC_INCLUDE_DIRECTORIES
         "${CMAKE_CURRENT_SOURCE_DIR}/../../src"
     INSTALL_INCLUDE_DIRECTORIES
         "${CMAKE_CURRENT_SOURCE_DIR}/../../src/${name}"
+    PUBLIC_COMPILE_DEFINITIONS
+        "RUISAPP_RENDER_OPENGL"
     DEPENDENCIES
         ruis
         ruis-render-opengl
     EXTERNAL_DEPENDENCIES
+        GLEW
+)
+
+declare_library(${name}-opengles
+    SOURCES
+        ${srcs}
+    PUBLIC_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../src"
+    INSTALL_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../src/${name}"
+    PUBLIC_COMPILE_DEFINITIONS
+        "RUISAPP_RENDER_OPENGLES"
+    DEPENDENCIES
+        ruis
+        ruis-render-opengles
+    EXTERNAL_DEPENDENCIES
+        EGL
+        GLESv2
 )
 
 if(NOT RUISAPP_DISABLE_EXAMPLE)
@@ -57,6 +77,6 @@ if(NOT RUISAPP_DISABLE_EXAMPLE)
         DEPENDENCIES
             ruis
         LINK_LIBRARIES
-            ruisapp
+            ruisapp-opengl
     )
 endif()
