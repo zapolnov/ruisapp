@@ -7,7 +7,8 @@ include prorab-install-dbgsrc.mk
 # =====================================
 # === wayland shell client protocol ===
 
-ifeq ($(os), linux)
+ifeq ($(config), emsc)
+else ifeq ($(os), linux)
     this_out_dir := out/
 
     this_name := xdg-shell-client-protocol
@@ -57,7 +58,9 @@ define ruisapp_rules
 
     ifeq ($2,sdl)
         this_ldlibs += -l SDL2
+
         this_cxxflags += -D RUISAPP_BACKEND_SDL
+
     else ifeq ($(os), linux)
         # use -isystem instead of -I to prevent clang-tidy follow the includes from these locations
         this_cxxflags += $$(patsubst -I%,-isystem%,$$(shell pkg-config --cflags gdk-3.0))
@@ -75,16 +78,19 @@ define ruisapp_rules
             this_ldlibs += -l wayland-cursor
             this_ldlibs += $(wayland_shell_protocol_lib)
             this_ldlibs += -l xkbcommon
+
             this_cxxflags += -isystem $(dir $(wayland_shell_protocol_header))
             this_cxxflags += -D RUISAPP_BACKEND_WAYLAND
         else ifeq ($2,xorg)
             this_ldlibs += -l X11
         else
         endif
+
     else ifeq ($(os), windows)
         this_ldlibs += -l gdi32
         this_ldlibs += -l opengl32
         this_ldlibs += -l glew32
+
     else ifeq ($(os), macosx)
         this_ldlibs += -l GLEW
         this_ldlibs += -framework Cocoa
@@ -97,7 +103,7 @@ define ruisapp_rules
             $$(this_mm_obj): $$(d)ruisapp/glue/macosx/glue.mm
 $(.RECIPEPREFIX)@echo compile $$$$<
 $(.RECIPEPREFIX)$(a)mkdir -p $$$$(dir $$$$@)
-$(.RECIPEPREFIX)$(a)$(this_cc) -ObjC++ -c -o "$$$$@" $$(this_cxxflags) $$(OBJCXXFLAGS) $$ $$$$<
+$(.RECIPEPREFIX)$(a)$(this_cc) -ObjC++ -c -o "$$$$@" $$(this_cxxflags) $$(OBJCXXFLAGS) $$(CXXFLAGS) $$ $$$$<
         endef
         $$(eval $$(this_subrules))
     endif
@@ -130,12 +136,16 @@ $(.RECIPEPREFIX)$(a)$(this_cc) -ObjC++ -c -o "$$$$@" $$(this_cxxflags) $$(OBJCXX
 endef
 
 ifeq ($(os), linux)
-    $(eval $(call ruisapp_rules,opengl,xorg))
-    $(eval $(call ruisapp_rules,opengles,xorg))
-    # $(eval $(call ruisapp_rules,opengl,wayland))
-    $(eval $(call ruisapp_rules,opengles,wayland))
-    $(eval $(call ruisapp_rules,opengl,sdl))
+    ifneq ($(config), emsc)
+        $(eval $(call ruisapp_rules,opengl,xorg))
+        $(eval $(call ruisapp_rules,opengles,xorg))
+        # $(eval $(call ruisapp_rules,opengl,wayland))
+        $(eval $(call ruisapp_rules,opengles,wayland))
+        $(eval $(call ruisapp_rules,opengl,sdl))
+    endif
+
     $(eval $(call ruisapp_rules,opengles,sdl))
+
 else
     $(eval $(call ruisapp_rules,opengl,))
 endif

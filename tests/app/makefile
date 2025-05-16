@@ -1,9 +1,13 @@
 include prorab.mk
 include prorab-test.mk
 
+$(eval $(call prorab-config, ../../config))
+
 this_name := ruisapp-test
 
-$(eval $(call prorab-config, ../../config))
+ifeq ($(config), emsc)
+    this_name := $(this_name).html
+endif
 
 this_srcs += $(call prorab-src-dir, src)
 
@@ -18,16 +22,22 @@ ifeq ($(os),linux)
         this__backend := xorg
     endif
 
-    this__cfg_suffix := $(if $(ogles2),opengles,opengl)-$(this__backend)
-    this_libruisapp := libruisapp-$(this__cfg_suffix)
+    this__cfg_suffix := $(if $(ogles),opengles,opengl)-$(this__backend)
+    this__libruisapp := libruisapp-$(this__cfg_suffix)
 else
-    this__cfg_suffix := $(if $(ogles2),opengles,opengl)
-    this_libruisapp := libruisapp-opengl
+    this__cfg_suffix := $(if $(ogles),opengles,opengl)
+    this__libruisapp := libruisapp-opengl
 endif
 
-this_libruisapp := ../../src/out/$(c)/$(this__cfg_suffix)/$(this_libruisapp)$(dot_so)
+this__libruisapp := ../../src/out/$(c)/$(this__cfg_suffix)/$(this__libruisapp)
 
-this_ldlibs += $(this_libruisapp)
+ifeq ($(config), emsc)
+    this__libruisapp := $(this__libruisapp).a
+else
+    this__libruisapp := $(this__libruisapp)$(dot_so)
+endif
+
+this_ldlibs += $(this__libruisapp)
 
 ifeq ($(os),windows)
     this_ldlibs += -lmingw32 # these should go first, otherwise linker will complain about undefined reference to WinMain
@@ -40,7 +50,17 @@ else ifeq ($(os),linux)
     this_ldflags += -rdynamic
 endif
 
-this_ldlibs += -ltml -lruis -lutki -lpapki -lm
+this_ldlibs += -l tml
+this_ldlibs += -l ruis
+this_ldlibs += -l utki
+this_ldlibs += -l papki
+this_ldlibs += -l m
+
+ifeq ($(config), emsc)
+    this_ldflags += -sWASM=1
+    this_ldflags += -sSINGLE_FILE
+    this_ldflags += --embed-file $(d)res@res
+endif
 
 $(eval $(prorab-build-app))
 
@@ -51,3 +71,12 @@ this_test_ld_path := ../../src/out/$(c)/$(this__cfg_suffix)/
 $(eval $(prorab-run))
 
 $(eval $(call prorab-include, ../../src/makefile))
+
+# targets for building with conan and emscripten
+
+define this__rules
+conan_install:
+$(.RECIPEPREFIX)@echo install conan dependencies
+$(.RECIPEPREFIX)$(a)conan install $(d)../../build/emscripten --update --profile:host $(d)../../build/emscripten/conan.profile --build=missing --output-folder=$(d)out/emsc --deployer-package="*"
+endef
+$(eval $(this__rules))
