@@ -1,0 +1,37 @@
+{
+    "default-registry": {
+      "kind": "git",
+      "baseline": "9b5cb8e554487f3edb5d50b80188883846f81e14",
+      "repository": "https://github.com/microsoft/vcpkg"
+    },
+    "registries": [
+      {
+        "kind": "git",
+        "repository": "https://github.com/cppfw/vcpkg-repo/",
+        "baseline": "cce66f9c54ded2e955d1d4cbb8320b6f5d44d87e",
+        "reference": "main",
+        "packages": [
+          "myci",
+          "utki",
+          "papki",
+          "opros",
+          "nitki",
+          "ruis",
+          "r4",
+          "rasterimage",
+          "svgren",
+          "svgdom",
+          "agg",
+          "cssom",
+          "mikroxml",
+          "tml",
+          "veg",
+          "ruis-render-opengl",
+          "ruis-render-opengles"
+        ]
+      }
+    ],
+    "overlay-ports": [
+      "../overlay"
+    ]
+  }
